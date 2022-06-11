@@ -1,26 +1,43 @@
-var ix = 0;
-var next_ix=1;
+"use strict";
+
+var ix,next_ix,t,theta_x,theta_y;
+
 const t_transition=10.0;
+const rot_speed_x=0.05,rot_speed_y=0.03;
 const scale_factor=0.85;
-var t=0.0;
+
 const fps=50;
 const dt=1/fps;
-const delay=Math.ceil(1000*dt);
-const rot_speed_x=0.05;
-const rot_speed_y=0.03;
-var theta_x=0.0,theta_y=0.0;
-var canvas = document.getElementById("canvas");
-var context = canvas.getContext("2d");
-var land_img = document.createElement("img");
-land_img.src = "https://i.postimg.cc/bw91Wxcp/fleur.jpg";
-const land_texture = context.createPattern(land_img, "repeat");
+const delay=Math.ceil(1000*dt)
+
 const projections = [d3.geoPolyconicRaw,d3.geoBonneRaw(Math.PI / 4),d3.geoFoucautRaw,d3.geoBonneRaw(Math.PI / 2)];
-outline = ({type: "Sphere"});
+var canvas,context,bg_img,texture;
+
+const outline = ({type: "Sphere"});
 const lerp1=(x0, x1, t)=>{return (1 - t) * x0 + t * x1;};
 const lerp2=([x0, y0], [x1, y1], t) =>{return [(1 - t) * x0 + t * x1, (1 - t) * y0 + t * y1];};
 const rot_angle=(tx,ty)=>{return [360*tx,360*ty];};
 const land = topojson.feature(world, world.objects.land);
-init();
+
+function init() {
+  canvas=document.createElement("canvas");
+  canvas.id="canvas";
+  canvas.innerText="Please update your browser ;)"
+  canvas.style="position: absolute;top:0;bottom: 0;left: 0;right: 0;margin:auto;"
+  document.body.appendChild(canvas);
+  context=canvas.getContext("2d");
+  resizeCanvas();
+
+  bg_img = document.createElement("img");
+  bg_img.src = "https://i.postimg.cc/bw91Wxcp/fleur.jpg";
+
+  texture=context.createPattern(bg_img, "repeat");
+
+  ix=0;
+  next_ix=1;
+  t=theta_x=theta_y=0.0;
+  setInterval(update,delay)
+}
 
 function resizeCanvas() {
   canvas.width = Math.ceil(scale_factor*window.innerWidth);
@@ -51,10 +68,7 @@ function lerp_projection(raw0, raw1) {
       .precision(0.1);
 }
 
-function init() {
-    resizeCanvas();
-    setInterval(update,delay)
-}
+
 
 function update() {
     const proj=lerp_projection(projections[ix],projections[next_ix])(t/t_transition);
@@ -78,8 +92,7 @@ function render(projection) {
     context.fillRect(0, 0, context.width, context.height);
   context.beginPath(),
     path(land),
-    (context.fillStyle = land_texture),
+    (context.fillStyle = texture),
     context.fill();
   context.restore();
 }
-ease = d3.easeCubicInOut;
