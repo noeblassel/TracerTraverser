@@ -9,10 +9,20 @@
     <script src="https://unpkg.com/topojson@3.0.2/dist/topojson.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
     <script src="topology.js"></script>
+    <style>
+        #canvas {
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin:auto;
+}
+    </style>
     
 </head>
 <body onresize="resizeCanvas();" style="background-color:black;">
-    <canvas id="canvas" width="1" height="1"></canvas>
+    <canvas id="canvas" width="1" height="1" style="display:inline;">Please update your browser ;)</canvas>
     <script src="projections.js"></script>
 </body>
 </html>

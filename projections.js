@@ -1,8 +1,9 @@
 var ix = 0;
 var next_ix=1;
 const t_transition=10.0;
+const scale_factor=0.85;
 var t=0.0;
-const fps=30;
+const fps=50;
 const dt=1/fps;
 const delay=Math.ceil(1000*dt);
 const rot_speed_x=0.05;
@@ -22,10 +23,10 @@ const land = topojson.feature(world, world.objects.land);
 init();
 
 function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  context.width = window.innerWidth;
-  context.height = window.innerHeight;
+  canvas.width = Math.ceil(scale_factor*window.innerWidth);
+  canvas.height = Math.ceil(scale_factor*window.innerHeight);
+  context.width = canvas.width;
+  context.height = canvas.height;
 }
 
 function fit(raw) {
@@ -52,8 +53,7 @@ function lerp_projection(raw0, raw1) {
 
 function init() {
     resizeCanvas();
-    const frame_delay=40;
-    setInterval(update,frame_delay)
+    setInterval(update,delay)
 }
 
 function update() {
