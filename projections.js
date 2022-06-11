@@ -1,7 +1,13 @@
 var ix = 0;
 var next_ix=1;
-var step_n=0;
-const n_transition_steps = 360;
+const t_transition=10.0;
+var t=0.0;
+const fps=30;
+const dt=1/fps;
+const delay=Math.ceil(1000*dt);
+const rot_speed_x=0.05;
+const rot_speed_y=0.03;
+var theta_x=0.0,theta_y=0.0;
 var canvas = document.getElementById("canvas");
 var context = canvas.getContext("2d");
 var land_img = document.createElement("img");
@@ -11,6 +17,7 @@ const projections = [d3.geoPolyconicRaw,d3.geoBonneRaw(Math.PI / 4),d3.geoFoucau
 outline = ({type: "Sphere"});
 const lerp1=(x0, x1, t)=>{return (1 - t) * x0 + t * x1;};
 const lerp2=([x0, y0], [x1, y1], t) =>{return [(1 - t) * x0 + t * x1, (1 - t) * y0 + t * y1];};
+const rot_angle=(tx,ty)=>{return [360*tx,360*ty];};
 const land = topojson.feature(world, world.objects.land);
 init();
 
@@ -32,7 +39,7 @@ function fit(raw) {
   return { scale: p.scale(), translate: p.translate() };
 }
 
-function interpolateProjection(raw0, raw1) {
+function lerp_projection(raw0, raw1) {
   const { scale: scale0, translate: translate0 } = fit(raw0);
   const { scale: scale1, translate: translate1 } = fit(raw1);
   return (t) =>
@@ -50,14 +57,15 @@ function init() {
 }
 
 function update() {
-    const t=step_n/n_transition_steps;
-    const proj=interpolateProjection(projections[ix],projections[next_ix])(t);
-    render(proj.rotate([step_n,step_n]));
-    step_n++;
-    if (step_n%n_transition_steps==0){
-        step_n=0;
+    const proj=lerp_projection(projections[ix],projections[next_ix])(t/t_transition);
+    render(proj.rotate(rot_angle(theta_x,theta_y)));
+    t+=dt;
+    theta_x=(theta_x+dt*rot_speed_x)%(1.0);
+    theta_y=(theta_y+dt*rot_speed_y)%(1.0);
+    if (t>t_transition){
         ix=next_ix;
         next_ix=(next_ix+1)%projections.length;
+        t-=t_transition;
     }
 }
 
