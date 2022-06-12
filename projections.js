@@ -2,11 +2,11 @@
 
 var ix,next_ix,t,theta_x,theta_y;
 
-const t_transition=10.0; //temps entre deux transitions (en secondes)
-const rot_speed_x=0.05,rot_speed_y=0.03; //vitesses de rotation du globe (altitude et azimut)
+const t_transition=20.0; //temps entre deux transitions (en secondes)
+const rot_speed_x=0.03,rot_speed_y=0.02; //vitesses de rotation du globe (altitude et azimut)
 const scale_factor=0.85; //proportion de la page occupée par le globe (entre 0 et 1)
 
-const fps=50;
+const fps=40;
 const dt=1/fps;
 const delay=Math.ceil(1000*dt)
 
