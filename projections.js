@@ -1,14 +1,11 @@
 "use strict";
 
+var last_ts;
 var ix,next_ix,t,theta_x,theta_y;
 
-const t_transition=20.0; //temps entre deux transitions (en secondes)
-const rot_speed_x=0.03,rot_speed_y=0.02; //vitesses de rotation du globe (altitude et azimut)
+const t_transition=30.0; //temps entre deux transitions (en secondes)
+const rot_speed_x=0.019,rot_speed_y=0.013; //vitesses de rotation du globe (altitude et azimut)
 const scale_factor=0.85; //proportion de la page occupée par le globe (entre 0 et 1)
-
-const fps=40;
-const dt=1/fps;
-const delay=Math.ceil(1000*dt)
 
 const projections = [d3.geoPolyconicRaw,d3.geoBonneRaw(Math.PI / 4),d3.geoFoucautRaw,d3.geoBonneRaw(Math.PI / 2)];
 var canvas,context,bg_img,texture;
@@ -34,9 +31,10 @@ function init() {
   texture=context.createPattern(bg_img, "repeat");
 
   ix=0;
-  next_ix=1;
+  next_ix=Math.floor(projections.length*Math.random());
   t=theta_x=theta_y=0.0;
-  setInterval(update,delay)
+  last_ts=0;
+  update(1);
 }
 
 function resizeCanvas() {
@@ -70,17 +68,22 @@ function lerp_projection(raw0, raw1) {
 
 
 
-function update() {
+function update(ts) {
+    const dt=(ts-last_ts)/1000
+    last_ts=ts
     const proj=lerp_projection(projections[ix],projections[next_ix])(t/t_transition);
     render(proj.rotate(rot_angle(theta_x,theta_y)));
     t+=dt;
-    theta_x=(theta_x+dt*rot_speed_x)%(1.0);
-    theta_y=(theta_y+dt*rot_speed_y)%(1.0);
+    theta_x=theta_x+dt*rot_speed_x;
+    theta_y=theta_y+dt*rot_speed_y;
     if (t>t_transition){
         ix=next_ix;
-        next_ix=(next_ix+1)%projections.length;
+        next_ix=Math.floor(projections.length*Math.random());;
         t-=t_transition;
     }
+    if(theta_x>1)theta_x-=1;
+    if(theta_y>1)theta_y-=1;
+  requestAnimationFrame(update);
 }
 
 function render(projection) {
