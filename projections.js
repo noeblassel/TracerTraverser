@@ -1,4 +1,4 @@
-"use strict";
+//"use strict";
 
 var last_ts;
 var ix,next_ix,t,theta_x,theta_y;
@@ -8,7 +8,7 @@ const rot_speed_x=0.019,rot_speed_y=0.013; //vitesses de rotation du globe (alti
 const scale_factor=0.85; //proportion de la page occupée par le globe (entre 0 et 1)
 
 const projections = [d3.geoPolyconicRaw,d3.geoBonneRaw(Math.PI / 4),d3.geoFoucautRaw,d3.geoBonneRaw(Math.PI / 2)];
-var canvas,context,bg_img,texture;
+var canvas,context,texture;
 
 const outline = ({type: "Sphere"});
 const lerp1=(x0, x1, t)=>{return (1 - t) * x0 + t * x1;};
@@ -24,17 +24,13 @@ function init() {
   document.body.appendChild(canvas);
   context=canvas.getContext("2d");
   resizeCanvas();
-
-  bg_img = document.createElement("img");
-  bg_img.src = "https://i.postimg.cc/bw91Wxcp/fleur.jpg";
-
+  const bg_img=document.getElementById("bg");
   texture=context.createPattern(bg_img, "repeat");
-
   ix=0;
   next_ix=Math.floor(projections.length*Math.random());
   t=theta_x=theta_y=0.0;
   last_ts=0;
-  update(1);
+  update();
 }
 
 function resizeCanvas() {
@@ -66,14 +62,12 @@ function lerp_projection(raw0, raw1) {
       .precision(0.1);
 }
 
-
-
-function update(ts) {
-    const dt=(ts-last_ts)/1000
-    last_ts=ts
+function update(ts=0) {
+    const dt=(ts-last_ts)/1000;
     const proj=lerp_projection(projections[ix],projections[next_ix])(t/t_transition);
-    render(proj.rotate(rot_angle(theta_x,theta_y)));
     t+=dt;
+    last_ts=ts
+    render(proj.rotate(rot_angle(theta_x,theta_y)));
     theta_x=theta_x+dt*rot_speed_x;
     theta_y=theta_y+dt*rot_speed_y;
     if (t>t_transition){
