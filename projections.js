@@ -1,4 +1,4 @@
-//"use strict";
+"use strict";
 
 var last_ts;
 var ix,next_ix,t,theta_x,theta_y;
@@ -14,6 +14,11 @@ const outline = ({type: "Sphere"});
 const lerp1=(x0, x1, t)=>{return (1 - t) * x0 + t * x1;};
 const lerp2=([x0, y0], [x1, y1], t) =>{return [(1 - t) * x0 + t * x1, (1 - t) * y0 + t * y1];};
 const rot_angle=(tx,ty)=>{return [360*tx,360*ty];};
+const get_next_ix=(ix)=>{
+  var n_ix=Math.floor(projections.length*Math.random());
+  while(ix==n_ix)n_ix=Math.floor(projections.length*Math.random());
+  return n_ix;
+}
 const land = topojson.feature(world, world.objects.land);
 
 function init() {
@@ -26,8 +31,8 @@ function init() {
   resizeCanvas();
   const bg_img=document.getElementById("bg");
   texture=context.createPattern(bg_img, "repeat");
-  ix=0;
-  next_ix=Math.floor(projections.length*Math.random());
+  ix=Math.floor(projections.length*Math.random());
+  next_ix=get_next_ix(ix);
   t=theta_x=theta_y=0.0;
   last_ts=0;
   update();
@@ -72,8 +77,8 @@ function update(ts=0) {
     theta_y=theta_y+dt*rot_speed_y;
     if (t>t_transition){
         ix=next_ix;
-        next_ix=Math.floor(projections.length*Math.random());;
-        t-=t_transition;
+        next_ix=get_next_ix(ix);
+        t%=t_transition;
     }
     if(theta_x>1)theta_x-=1;
     if(theta_y>1)theta_y-=1;
