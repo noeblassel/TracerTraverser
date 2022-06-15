@@ -80,8 +80,8 @@ function update(ts=0) {
         next_ix=get_next_ix(ix);
         t%=t_transition;
     }
-    if(theta_x>1)theta_x-=1;
-    if(theta_y>1)theta_y-=1;
+    if(theta_x>1)theta_x%=1;
+    if(theta_y>1)theta_y%=1;
   requestAnimationFrame(update);
 }
 
